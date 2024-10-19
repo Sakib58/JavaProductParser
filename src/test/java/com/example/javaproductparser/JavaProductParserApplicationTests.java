@@ -78,6 +78,14 @@ class JavaProductParserApplicationTests {
     }
 
     @Test
+    void getProductInfoBySkuTest(){
+        ProductDto productDto = productService.getProductInfoBySku("PROD-1010");
+        assertEquals("Smartwatch", productDto.getTitle());
+        assertEquals(80, productDto.getQuantity());
+        assertEquals("129.99", productDto.getPrice().toPlainString());
+    }
+
+    @Test
     void contextLoads() {
     }
 
