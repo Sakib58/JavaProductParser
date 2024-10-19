@@ -158,4 +158,9 @@ public class ProductService {
         return productChangeSummaries;
     }
 
+    public ProductDto getProductInfoBySku(String sku) {
+        //todo: Implement logic here
+        return ProductDto.builder().build();
+    }
+
 }
