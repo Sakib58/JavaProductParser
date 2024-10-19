@@ -84,6 +84,7 @@ public class ProductService {
         summary.setChangedRowsCount(summaryDto.getUpdatedRows().size());
         summary.setCreatedAt(LocalDateTime.now());
         summary.setSummary(createChangeSummary(summaryDto.getNewRows(), summaryDto.getUpdatedRows()));
+        productChangeSummaryRepository.save(summary);
     }
 
     private String createChangeSummary(List<ProductDto> newRows, List<ProductDto> updatedRows) {
