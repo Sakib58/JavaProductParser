@@ -7,6 +7,7 @@ import com.example.javaproductparser.parser.entity.ProductChangeSummary;
 import com.example.javaproductparser.parser.repository.ProductChangeSummaryRepository;
 import com.example.javaproductparser.parser.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -170,8 +171,14 @@ public class ProductService {
     }
 
     public List<ProductDto> getProductList() {
-        //todo: implement business logic here
-        return new ArrayList<>();
+        return productRepository.findAll()
+                .stream()
+                .map(product -> {
+                    ProductDto productDto = new ProductDto();
+                    BeanUtils.copyProperties(product, productDto);
+                    return productDto;
+                })
+                .toList();
     }
 
 }
