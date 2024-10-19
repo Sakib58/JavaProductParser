@@ -1,6 +1,8 @@
 package com.example.javaproductparser;
 
+import com.example.javaproductparser.parser.dto.ProductChangeSummaryDto;
 import com.example.javaproductparser.parser.dto.ProductDto;
+import com.example.javaproductparser.parser.service.ProductService;
 import com.example.javaproductparser.parser.service.XlsxFileParser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ class JavaProductParserApplicationTests {
     @Autowired
     private XlsxFileParser xlsxFileParser;
 
+    @Autowired
+    private ProductService productService;
+
     @Test
     void parseFileTest() throws IOException {
         String filePath = "C:\\Users\\Reve\\OneDrive\\Documents\\product_list.xlsx";
@@ -35,6 +40,29 @@ class JavaProductParserApplicationTests {
 
         // To make sure dto contains data
         assertEquals("PROD-1001", productList.get(0).getSku());
+    }
+
+    @Test
+    void uploadFileTest() throws IOException {
+        String filePath = "C:\\Users\\Reve\\OneDrive\\Documents\\product_list.xlsx";
+        ProductChangeSummaryDto productChangeSummaryDto = productService.uploadFile(new FileInputStream(filePath));
+        assertEquals(10, productChangeSummaryDto.getNewRows().size());
+        assertEquals(0, productChangeSummaryDto.getUnchangedRows().size());
+        assertEquals(0, productChangeSummaryDto.getUpdatedRows().size());
+
+        // New file with 3 rows changed
+        filePath = "C:\\Users\\Reve\\OneDrive\\Documents\\product_list_changed_3_rows.xlsx";
+        productChangeSummaryDto = productService.uploadFile(new FileInputStream(filePath));
+        assertEquals(0, productChangeSummaryDto.getNewRows().size());
+        assertEquals(7, productChangeSummaryDto.getUnchangedRows().size());
+        assertEquals(3, productChangeSummaryDto.getUpdatedRows().size());
+
+        // New file with 2 rows changed and 3 new rows added
+        filePath = "C:\\Users\\Reve\\OneDrive\\Documents\\product_list_changed_2_rows_added_3.xlsx";
+        productChangeSummaryDto = productService.uploadFile(new FileInputStream(filePath));
+        assertEquals(3, productChangeSummaryDto.getNewRows().size());
+        assertEquals(8, productChangeSummaryDto.getUnchangedRows().size());
+        assertEquals(2, productChangeSummaryDto.getUpdatedRows().size());
     }
 
     @Test
