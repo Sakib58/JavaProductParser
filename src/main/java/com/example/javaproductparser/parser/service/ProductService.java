@@ -3,15 +3,19 @@ package com.example.javaproductparser.parser.service;
 import com.example.javaproductparser.parser.dto.ProductChangeSummaryDto;
 import com.example.javaproductparser.parser.dto.ProductDto;
 import com.example.javaproductparser.parser.entity.Product;
+import com.example.javaproductparser.parser.entity.ProductChangeSummary;
+import com.example.javaproductparser.parser.repository.ProductChangeSummaryRepository;
 import com.example.javaproductparser.parser.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -20,10 +24,12 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
     private final FileParser fileParser;
+    private final ProductChangeSummaryRepository productChangeSummaryRepository;
 
-    public ProductService(ProductRepository productRepository, FileParser fileParser) {
+    public ProductService(ProductRepository productRepository, FileParser fileParser, ProductChangeSummaryRepository productChangeSummaryRepository) {
         this.productRepository = productRepository;
         this.fileParser = fileParser;
+        this.productChangeSummaryRepository = productChangeSummaryRepository;
     }
 
     public ProductChangeSummaryDto uploadFile(InputStream inputStream) throws IOException {
@@ -67,8 +73,61 @@ public class ProductService {
         summary.setUpdatedRows(updatedRows);
         summary.setUnchangedRows(unchangedRows);
 
+        saveChangeSummary(summary);
+
         return summary;
     }
+
+    private void saveChangeSummary(ProductChangeSummaryDto summaryDto) {
+        ProductChangeSummary summary = new ProductChangeSummary();
+        summary.setNewRowsCount(summaryDto.getNewRows().size());
+        summary.setChangedRowsCount(summaryDto.getUpdatedRows().size());
+        summary.setCreatedAt(LocalDateTime.now());
+        summary.setSummary(createChangeSummary(summaryDto.getNewRows(), summaryDto.getUpdatedRows()));
+    }
+
+    private String createChangeSummary(List<ProductDto> newRows, List<ProductDto> updatedRows) {
+        StringBuilder summaryBuilder = new StringBuilder();
+
+        // Add new products details
+        if (!newRows.isEmpty()) {
+            summaryBuilder.append("New Products:\n");
+            for (ProductDto newProduct : newRows) {
+                summaryBuilder.append("SKU: ").append(newProduct.getSku())
+                        .append(", Title: ").append(newProduct.getTitle())
+                        .append(", Price: ").append(newProduct.getPrice())
+                        .append(", Quantity: ").append(newProduct.getQuantity())
+                        .append("\n");
+            }
+        }
+
+        // Add updated products details
+        if (!updatedRows.isEmpty()) {
+            summaryBuilder.append("Updated Products:\n");
+            for (ProductDto updatedProduct : updatedRows) {
+                Optional<Product> optionalExistingProduct = productRepository.findBySku(updatedProduct.getSku());
+                if (optionalExistingProduct.isPresent()) {
+                    Product existingProduct = optionalExistingProduct.get();
+                    summaryBuilder.append("SKU: ").append(updatedProduct.getSku()).append("\n");
+                    if (!existingProduct.getTitle().equals(updatedProduct.getTitle())) {
+                        summaryBuilder.append(" - Title: '").append(existingProduct.getTitle())
+                                .append("' changed to '").append(updatedProduct.getTitle()).append("'\n");
+                    }
+                    if (existingProduct.getPrice().compareTo(updatedProduct.getPrice()) != 0) {
+                        summaryBuilder.append(" - Price: '").append(existingProduct.getPrice())
+                                .append("' changed to '").append(updatedProduct.getPrice()).append("'\n");
+                    }
+                    if (existingProduct.getQuantity() != updatedProduct.getQuantity()) {
+                        summaryBuilder.append(" - Quantity: '").append(existingProduct.getQuantity())
+                                .append("' changed to '").append(updatedProduct.getQuantity()).append("'\n");
+                    }
+                }
+            }
+        }
+
+        return summaryBuilder.toString();
+    }
+
 
     private void saveProducts(List<ProductDto> newRows, List<ProductDto> updatedRows) {
         // Save new products
