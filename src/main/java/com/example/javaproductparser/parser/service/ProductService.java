@@ -12,10 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -67,13 +64,13 @@ public class ProductService {
             }
         }
 
-        saveProducts(newRows, updatedRows);
-
         summary.setNewRows(newRows);
         summary.setUpdatedRows(updatedRows);
         summary.setUnchangedRows(unchangedRows);
 
         saveChangeSummary(summary);
+
+        saveProducts(newRows, updatedRows);
 
         return summary;
     }
@@ -110,11 +107,13 @@ public class ProductService {
                 if (optionalExistingProduct.isPresent()) {
                     Product existingProduct = optionalExistingProduct.get();
                     summaryBuilder.append("SKU: ").append(updatedProduct.getSku()).append("\n");
-                    if (!existingProduct.getTitle().equals(updatedProduct.getTitle())) {
+
+                    if (!Objects.equals(existingProduct.getTitle(), updatedProduct.getTitle())) {
                         summaryBuilder.append(" - Title: '").append(existingProduct.getTitle())
                                 .append("' changed to '").append(updatedProduct.getTitle()).append("'\n");
                     }
-                    if (existingProduct.getPrice().compareTo(updatedProduct.getPrice()) != 0) {
+                    if (existingProduct.getPrice() != null && updatedProduct.getPrice() != null &&
+                            existingProduct.getPrice().compareTo(updatedProduct.getPrice()) != 0) {
                         summaryBuilder.append(" - Price: '").append(existingProduct.getPrice())
                                 .append("' changed to '").append(updatedProduct.getPrice()).append("'\n");
                     }
