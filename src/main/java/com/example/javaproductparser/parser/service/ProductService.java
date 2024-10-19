@@ -159,8 +159,14 @@ public class ProductService {
     }
 
     public ProductDto getProductInfoBySku(String sku) {
-        //todo: Implement logic here
-        return ProductDto.builder().build();
+        Product product = productRepository.findBySku(sku).orElseThrow();
+        return ProductDto.builder()
+                .id(product.getId())
+                .sku(product.getSku())
+                .title(product.getTitle())
+                .price(product.getPrice())
+                .quantity(product.getQuantity())
+                .build();
     }
 
 }
