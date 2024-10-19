@@ -31,7 +31,7 @@ class JavaProductParserApplicationTests {
         assertEquals(10, productList.size());
 
         // To make sure that the row with column names is ignored
-        assertEquals("sku", productList.get(0).getSku().toLowerCase());
+        assertNotEquals("sku", productList.get(0).getSku().toLowerCase());
 
         // To make sure dto contains data
         assertEquals("PROD-1001", productList.get(0).getSku());
