@@ -86,6 +86,12 @@ class JavaProductParserApplicationTests {
     }
 
     @Test
+    void getProductListTest() {
+        List<ProductDto> productDtoList = productService.getProductList();
+        assertEquals(13, productDtoList.size());
+    }
+
+    @Test
     void contextLoads() {
     }
 
