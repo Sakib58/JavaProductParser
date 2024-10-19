@@ -24,6 +24,9 @@ public class ProductChangeSummary {
 
     private Integer newRowsCount;
     private Integer changedRowsCount;
+
+    @Lob
     private String summary;
+
     private LocalDateTime createdAt;
 }
