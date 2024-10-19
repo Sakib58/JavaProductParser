@@ -169,4 +169,9 @@ public class ProductService {
                 .build();
     }
 
+    public List<ProductDto> getProductList() {
+        //todo: implement business logic here
+        return new ArrayList<>();
+    }
+
 }
