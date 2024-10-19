@@ -153,8 +153,8 @@ public class ProductService {
     }
 
     public List<ProductChangeSummary> getSummaryHistoryOfTheUploadedFile(){
-        List<ProductChangeSummary> productChangeSummaries = new ArrayList<>();
-        //todo: implement product change summary history logic here
+        List<ProductChangeSummary> productChangeSummaries = productChangeSummaryRepository
+                .findAll().stream().sorted(Comparator.comparing(ProductChangeSummary::getCreatedAt).reversed()).toList();
         return productChangeSummaries;
     }
 
