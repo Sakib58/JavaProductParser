@@ -152,4 +152,10 @@ public class ProductService {
         }
     }
 
+    public List<ProductChangeSummary> getSummaryHistoryOfTheUploadedFile(){
+        List<ProductChangeSummary> productChangeSummaries = new ArrayList<>();
+        //todo: implement product change summary history logic here
+        return productChangeSummaries;
+    }
+
 }
