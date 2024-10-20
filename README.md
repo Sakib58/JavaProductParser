@@ -25,7 +25,7 @@ Only the updated and newly added rows are reflected in the database, ensuring ef
 - **src/test/java**: Contains unit tests.
 - **src/test/resources**: Contains test resources such as Excel files.
 - **src/main/resources**: Contains application configuration files.
-- **src/main/resources/postman_collection.json**: A collection of API requests for testing with Postman.
+- **JavaProductParser.postman_collection.json**: A collection of API requests for testing with Postman.
 
 ## API Endpoints
 
@@ -88,7 +88,7 @@ Only the updated and newly added rows are reflected in the database, ensuring ef
    ```bash
    mvn spring-boot:run
    ```
-6. Use the Postman collection for testing the API. You can find the collection [here](https://github.com/Sakib58/JavaProductParser/blob/main/src/main/resources/JavaProductParser.postman_collection.json).
+6. Use the Postman collection for testing the API. You can find the collection [here](https://github.com/Sakib58/JavaProductParser/blob/main/JavaProductParser.postman_collection.json).
 
 ## Running with Docker
 1. Build the JAR File (skipping tests if necessary):
@@ -99,7 +99,7 @@ Only the updated and newly added rows are reflected in the database, ensuring ef
    ```bash
    docker-compose up --build
    ```
-3. Use the Postman collection for testing the API. You can find the collection [here](https://github.com/Sakib58/JavaProductParser/blob/main/src/main/resources/JavaProductParser.postman_collection.json).
+3. Use the Postman collection for testing the API. You can find the collection [here](https://github.com/Sakib58/JavaProductParser/blob/main/JavaProductParser.postman_collection.json).
 
 4. To stop and remove the Docker containers, run:
     ```bash
