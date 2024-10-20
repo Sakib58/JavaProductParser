@@ -1,0 +1,35 @@
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql_db_container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: java_product_parser
+      MYSQL_USER: sakib
+      MYSQL_PASSWORD: sakib
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - product-parser-network
+  app:
+    build: .
+    container_name: product_parser_app
+    ports:
+      - "8090:8080"
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/java_product_parser
+      SPRING_DATASOURCE_USERNAME: sakib
+      SPRING_DATASOURCE_PASSWORD: sakib
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - product-parser-network
+volumes:
+  db-data:
+networks:
+  product-parser-network:
+    driver: bridge
