@@ -5,6 +5,7 @@ import com.example.javaproductparser.parser.dto.ProductDto;
 import com.example.javaproductparser.parser.entity.ProductChangeSummary;
 import com.example.javaproductparser.parser.service.ProductService;
 import com.example.javaproductparser.parser.service.XlsxFileParser;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,6 +42,7 @@ class JavaProductParserApplicationTests {
         assertEquals("PROD-1001", productList.get(0).getSku());
     }
 
+    @Transactional
     @Test
     void uploadFileTest() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("product_list.xlsx");
@@ -64,10 +66,16 @@ class JavaProductParserApplicationTests {
         assertEquals(2, productChangeSummaryDto.getUpdatedRows().size());
     }
 
+    @Transactional
     @Test
     void getSummaryHistoryOfTheUploadedFileTest(){
+        try {
+            uploadFileTest();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         List<ProductChangeSummary> summaryList = productService.getSummaryHistoryOfTheUploadedFile();
-        assertEquals(summaryList.size(), 3);
+        assertEquals(3, summaryList.size());
         assertEquals(10, summaryList.get(2).getNewRowsCount()); // Latest entry would be the first, so initially 10 rows were inserted
         assertEquals(3, summaryList.get(1).getChangedRowsCount()); // Then 3 rows modified
         // Then modified two rows and added 3 new rows
@@ -77,14 +85,25 @@ class JavaProductParserApplicationTests {
 
     @Test
     void getProductInfoBySkuTest(){
+        try {
+            uploadFileTest();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         ProductDto productDto = productService.getProductInfoBySku("PROD-1010");
         assertEquals("Smartwatch", productDto.getTitle());
         assertEquals(80, productDto.getQuantity());
         assertEquals("129.99", productDto.getPrice().toPlainString());
     }
 
+    @Transactional
     @Test
     void getProductListTest() {
+        try {
+            uploadFileTest();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         List<ProductDto> productDtoList = productService.getProductList();
         assertEquals(13, productDtoList.size());
     }
