@@ -155,9 +155,8 @@ public class ProductService {
     }
 
     public List<ProductChangeSummary> getSummaryHistoryOfTheUploadedFile(){
-        List<ProductChangeSummary> productChangeSummaries = productChangeSummaryRepository
+        return productChangeSummaryRepository
                 .findAll().stream().sorted(Comparator.comparing(ProductChangeSummary::getCreatedAt).reversed()).toList();
-        return productChangeSummaries;
     }
 
     public ProductDto getProductInfoBySku(String sku) {
