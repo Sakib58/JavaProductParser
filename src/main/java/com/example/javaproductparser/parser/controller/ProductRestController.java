@@ -34,7 +34,7 @@ public class ProductRestController {
         }
 
         try (InputStream inputStream = file.getInputStream()) {
-            ProductChangeSummaryDto productChangeSummaryDto = productService.uploadFile(inputStream);
+            ProductChangeSummaryDto productChangeSummaryDto = productService.uploadFile(inputStream, fileName);
             return ResponseEntity.ok(productChangeSummaryDto);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();

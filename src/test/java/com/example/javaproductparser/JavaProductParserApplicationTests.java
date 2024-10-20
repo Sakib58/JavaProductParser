@@ -44,21 +44,21 @@ class JavaProductParserApplicationTests {
     @Test
     void uploadFileTest() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("product_list.xlsx");
-        ProductChangeSummaryDto productChangeSummaryDto = productService.uploadFile(inputStream);
+        ProductChangeSummaryDto productChangeSummaryDto = productService.uploadFile(inputStream, "product_list.xlsx");
         assertEquals(10, productChangeSummaryDto.getNewRows().size());
         assertEquals(0, productChangeSummaryDto.getUnchangedRows().size());
         assertEquals(0, productChangeSummaryDto.getUpdatedRows().size());
 
         // New file with 3 rows changed
         inputStream = getClass().getClassLoader().getResourceAsStream("product_list_changed_3_rows.xlsx");
-        productChangeSummaryDto = productService.uploadFile(inputStream);
+        productChangeSummaryDto = productService.uploadFile(inputStream, "product_list_changed_3_rows.xlsx");
         assertEquals(0, productChangeSummaryDto.getNewRows().size());
         assertEquals(7, productChangeSummaryDto.getUnchangedRows().size());
         assertEquals(3, productChangeSummaryDto.getUpdatedRows().size());
 
         // New file with 2 rows changed and 3 new rows added
         inputStream = getClass().getClassLoader().getResourceAsStream("product_list_changed_2_rows_added_3.xlsx");
-        productChangeSummaryDto = productService.uploadFile(inputStream);
+        productChangeSummaryDto = productService.uploadFile(inputStream, "product_list_changed_2_rows_added_3.xlsx");
         assertEquals(3, productChangeSummaryDto.getNewRows().size());
         assertEquals(8, productChangeSummaryDto.getUnchangedRows().size());
         assertEquals(2, productChangeSummaryDto.getUpdatedRows().size());

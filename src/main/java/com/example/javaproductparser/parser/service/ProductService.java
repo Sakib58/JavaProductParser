@@ -21,16 +21,17 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
-    private final FileParser fileParser;
+    private final FileParserFactory fileParserFactory;
     private final ProductChangeSummaryRepository productChangeSummaryRepository;
 
-    public ProductService(ProductRepository productRepository, FileParser fileParser, ProductChangeSummaryRepository productChangeSummaryRepository) {
+    public ProductService(ProductRepository productRepository, FileParserFactory fileParserFactory, ProductChangeSummaryRepository productChangeSummaryRepository) {
         this.productRepository = productRepository;
-        this.fileParser = fileParser;
+        this.fileParserFactory = fileParserFactory;
         this.productChangeSummaryRepository = productChangeSummaryRepository;
     }
 
-    public ProductChangeSummaryDto uploadFile(InputStream inputStream) throws IOException {
+    public ProductChangeSummaryDto uploadFile(InputStream inputStream, String fileName) throws IOException {
+        FileParser fileParser = fileParserFactory.getParser(fileName);
         List<ProductDto> productList = fileParser.parseFile(inputStream);
         return calculateAndSaveChanges(productList);
     }
