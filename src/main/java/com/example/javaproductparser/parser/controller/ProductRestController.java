@@ -1,6 +1,7 @@
 package com.example.javaproductparser.parser.controller;
 
 import com.example.javaproductparser.parser.dto.ProductChangeSummaryDto;
+import com.example.javaproductparser.parser.entity.ProductChangeSummary;
 import com.example.javaproductparser.parser.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping(ApiEndpoints.BASE)
@@ -33,6 +35,16 @@ public class ProductRestController {
             ProductChangeSummaryDto productChangeSummaryDto = productService.uploadFile(inputStream);
             return ResponseEntity.ok(productChangeSummaryDto);
         } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping(ApiEndpoints.CHANGE_HISTORIES)
+    public ResponseEntity<List<ProductChangeSummary>> getProductChangeHistories(){
+        try{
+            List<ProductChangeSummary> productChangeSummaries = productService.getSummaryHistoryOfTheUploadedFile();
+            return ResponseEntity.ok(productChangeSummaries);
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
