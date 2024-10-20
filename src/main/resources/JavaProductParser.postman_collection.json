@@ -1,0 +1,132 @@
+{
+	"info": {
+		"_postman_id": "742a922c-5f64-40f7-9f1f-4e02635c3e70",
+		"name": "JavaProductParser",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13827370"
+	},
+	"item": [
+		{
+			"name": "UploadFile",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Reve/OneDrive/Documents/product_list.xlsx"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base}}/api/product/upload",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"product",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change Histories",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base}}/api/product/change-histories",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"product",
+						"change-histories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Product Info By SKU",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base}}/api/product/product-by-sku?sku=PROD-1005",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"product",
+						"product-by-sku"
+					],
+					"query": [
+						{
+							"key": "sku",
+							"value": "PROD-1005"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Products",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base}}/api/product/product/all",
+					"host": [
+						"{{base}}"
+					],
+					"path": [
+						"api",
+						"product",
+						"product",
+						"all"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base",
+			"value": "http://localhost:8090",
+			"type": "string"
+		}
+	]
+}
