@@ -24,19 +24,29 @@ public class ProductService {
     private final FileParserFactory fileParserFactory;
     private final ProductChangeSummaryRepository productChangeSummaryRepository;
 
-    public ProductService(ProductRepository productRepository, FileParserFactory fileParserFactory, ProductChangeSummaryRepository productChangeSummaryRepository) {
+    public ProductService(ProductRepository productRepository,
+                          FileParserFactory fileParserFactory,
+                          ProductChangeSummaryRepository productChangeSummaryRepository) {
         this.productRepository = productRepository;
         this.fileParserFactory = fileParserFactory;
         this.productChangeSummaryRepository = productChangeSummaryRepository;
     }
 
     public ProductChangeSummaryDto uploadFile(InputStream inputStream, String fileName) throws IOException {
+        log.info("Uploading file: {}", fileName);
+
         FileParser fileParser = fileParserFactory.getParser(fileName);
+        log.info("Using parser: {}", fileParser.getClass().getSimpleName());
+
         List<ProductDto> productList = fileParser.parseFile(inputStream);
+        log.info("Parsed {} products from file", productList.size());
+
         return calculateAndSaveChanges(productList);
     }
 
     private ProductChangeSummaryDto calculateAndSaveChanges(List<ProductDto> productList) {
+        log.info("Calculating changes for {} products", productList.size());
+
         ProductChangeSummaryDto summary = new ProductChangeSummaryDto();
         List<ProductDto> newRows = new ArrayList<>();
         List<ProductDto> updatedRows = new ArrayList<>();
@@ -51,6 +61,7 @@ public class ProductService {
 
             if (existingProduct == null) {
                 newRows.add(incomingProduct);
+                log.info("New product found: SKU {}", incomingProduct.getSku());
             } else {
                 boolean isUpdated = false;
                 if (!existingProduct.getTitle().equals(incomingProduct.getTitle()) ||
@@ -58,6 +69,7 @@ public class ProductService {
                         existingProduct.getQuantity() != incomingProduct.getQuantity()) {
                     updatedRows.add(incomingProduct);
                     isUpdated = true;
+                    log.info("Product updated: SKU {}", incomingProduct.getSku());
                 }
 
                 if (!isUpdated) {
@@ -66,24 +78,32 @@ public class ProductService {
             }
         }
 
+        log.info("New products: {}, Updated products: {}, Unchanged products: {}",
+                newRows.size(), updatedRows.size(), unchangedRows.size());
+
         summary.setNewRows(newRows);
         summary.setUpdatedRows(updatedRows);
         summary.setUnchangedRows(unchangedRows);
 
         saveChangeSummary(summary);
-
         saveProducts(newRows, updatedRows);
 
         return summary;
     }
 
     private void saveChangeSummary(ProductChangeSummaryDto summaryDto) {
+        log.info("Saving change summary");
+
         ProductChangeSummary summary = new ProductChangeSummary();
         summary.setNewRowsCount(summaryDto.getNewRows().size());
         summary.setChangedRowsCount(summaryDto.getUpdatedRows().size());
         summary.setCreatedAt(LocalDateTime.now());
         summary.setSummary(createChangeSummary(summaryDto.getNewRows(), summaryDto.getUpdatedRows()));
+
         productChangeSummaryRepository.save(summary);
+
+        log.info("Change summary saved with {} new products and {} updated products",
+                summaryDto.getNewRows().size(), summaryDto.getUpdatedRows().size());
     }
 
     private String createChangeSummary(List<ProductDto> newRows, List<ProductDto> updatedRows) {
@@ -91,6 +111,7 @@ public class ProductService {
 
         // Add new products details
         if (!newRows.isEmpty()) {
+            log.info("Adding new product details to summary");
             summaryBuilder.append("New Products:\n");
             for (ProductDto newProduct : newRows) {
                 summaryBuilder.append("SKU: ").append(newProduct.getSku())
@@ -103,6 +124,7 @@ public class ProductService {
 
         // Add updated products details
         if (!updatedRows.isEmpty()) {
+            log.info("Adding updated product details to summary");
             summaryBuilder.append("Updated Products:\n");
             for (ProductDto updatedProduct : updatedRows) {
                 Optional<Product> optionalExistingProduct = productRepository.findBySku(updatedProduct.getSku());
@@ -130,10 +152,10 @@ public class ProductService {
         return summaryBuilder.toString();
     }
 
-
     private void saveProducts(List<ProductDto> newRows, List<ProductDto> updatedRows) {
         // Save new products
         for (ProductDto newProduct : newRows) {
+            log.info("Saving new product: SKU {}", newProduct.getSku());
             Product productToSave = new Product();
             productToSave.setSku(newProduct.getSku());
             productToSave.setTitle(newProduct.getTitle());
@@ -144,8 +166,11 @@ public class ProductService {
 
         // Update existing products
         for (ProductDto updatedProduct : updatedRows) {
-            Product existingProduct = productRepository.findBySku(updatedProduct.getSku()).orElseThrow(() ->
-                    new RuntimeException("Product not found for update: " + updatedProduct.getSku()));
+            log.info("Updating product: SKU {}", updatedProduct.getSku());
+            Product existingProduct = productRepository.findBySku(updatedProduct.getSku()).orElseThrow(() -> {
+                log.error("Product not found for update: SKU {}", updatedProduct.getSku());
+                return new RuntimeException("Product not found for update: " + updatedProduct.getSku());
+            });
 
             existingProduct.setTitle(updatedProduct.getTitle());
             existingProduct.setPrice(updatedProduct.getPrice());
@@ -155,11 +180,13 @@ public class ProductService {
     }
 
     public List<ProductChangeSummary> getSummaryHistoryOfTheUploadedFile(){
+        log.info("Fetching change summary history");
         return productChangeSummaryRepository
                 .findAll().stream().sorted(Comparator.comparing(ProductChangeSummary::getCreatedAt).reversed()).toList();
     }
 
     public ProductDto getProductInfoBySku(String sku) {
+        log.info("Fetching product info for SKU: {}", sku);
         Product product = productRepository.findBySku(sku).orElseThrow();
         return ProductDto.builder()
                 .id(product.getId())
@@ -171,6 +198,7 @@ public class ProductService {
     }
 
     public List<ProductDto> getProductList() {
+        log.info("Fetching all products");
         return productRepository.findAll()
                 .stream()
                 .map(product -> {
@@ -180,5 +208,4 @@ public class ProductService {
                 })
                 .toList();
     }
-
 }
