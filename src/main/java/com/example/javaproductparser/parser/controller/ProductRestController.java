@@ -62,4 +62,14 @@ public class ProductRestController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @GetMapping(ApiEndpoints.PRODUCT_ALL)
+    public ResponseEntity<List<ProductDto>> getAllProducts(){
+        try {
+            List<ProductDto> productDtoList = productService.getProductList();
+            return ResponseEntity.ok(productDtoList);
+        } catch (Exception e){
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }
