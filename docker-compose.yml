@@ -14,13 +14,19 @@ services:
       - db-data:/var/lib/mysql
     networks:
       - product-parser-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   app:
     build: .
     container_name: product_parser_app
     ports:
       - "8090:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/java_product_parser
       SPRING_DATASOURCE_USERNAME: sakib
