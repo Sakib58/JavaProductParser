@@ -85,13 +85,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base}}/api/product/product/all",
+					"raw": "{{base}}/api/product/all",
 					"host": [
 						"{{base}}"
 					],
 					"path": [
 						"api",
-						"product",
 						"product",
 						"all"
 					]
