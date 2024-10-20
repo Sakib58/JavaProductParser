@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -27,8 +26,7 @@ class JavaProductParserApplicationTests {
 
     @Test
     void parseFileTest() throws IOException {
-        String filePath = "C:\\Users\\Reve\\OneDrive\\Documents\\product_list.xlsx";
-        InputStream inputStream = new FileInputStream(filePath);
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("product_list.xlsx");
 
         List<ProductDto> productList = xlsxFileParser.parseFile(inputStream);
 
@@ -45,22 +43,22 @@ class JavaProductParserApplicationTests {
 
     @Test
     void uploadFileTest() throws IOException {
-        String filePath = "C:\\Users\\Reve\\OneDrive\\Documents\\product_list.xlsx";
-        ProductChangeSummaryDto productChangeSummaryDto = productService.uploadFile(new FileInputStream(filePath));
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("product_list.xlsx");
+        ProductChangeSummaryDto productChangeSummaryDto = productService.uploadFile(inputStream);
         assertEquals(10, productChangeSummaryDto.getNewRows().size());
         assertEquals(0, productChangeSummaryDto.getUnchangedRows().size());
         assertEquals(0, productChangeSummaryDto.getUpdatedRows().size());
 
         // New file with 3 rows changed
-        filePath = "C:\\Users\\Reve\\OneDrive\\Documents\\product_list_changed_3_rows.xlsx";
-        productChangeSummaryDto = productService.uploadFile(new FileInputStream(filePath));
+        inputStream = getClass().getClassLoader().getResourceAsStream("product_list_changed_3_rows.xlsx");
+        productChangeSummaryDto = productService.uploadFile(inputStream);
         assertEquals(0, productChangeSummaryDto.getNewRows().size());
         assertEquals(7, productChangeSummaryDto.getUnchangedRows().size());
         assertEquals(3, productChangeSummaryDto.getUpdatedRows().size());
 
         // New file with 2 rows changed and 3 new rows added
-        filePath = "C:\\Users\\Reve\\OneDrive\\Documents\\product_list_changed_2_rows_added_3.xlsx";
-        productChangeSummaryDto = productService.uploadFile(new FileInputStream(filePath));
+        inputStream = getClass().getClassLoader().getResourceAsStream("product_list_changed_2_rows_added_3.xlsx");
+        productChangeSummaryDto = productService.uploadFile(inputStream);
         assertEquals(3, productChangeSummaryDto.getNewRows().size());
         assertEquals(8, productChangeSummaryDto.getUnchangedRows().size());
         assertEquals(2, productChangeSummaryDto.getUpdatedRows().size());
